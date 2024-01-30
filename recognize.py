@@ -3,7 +3,7 @@ import cv2
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 
-from config import DATASET_PATH, HAARCASCADE_PATH, MODEL_PATH
+from config import DATASET_PATH, DISPLAY_RESOLUTION, HAARCASCADE_PATH, MODEL_PATH
 
 # Load the trained face recognition model
 face_recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -11,9 +11,8 @@ face_recognizer = cv2.face.LBPHFaceRecognizer_create()
 face_recognizer.read(MODEL_PATH)
 
 # Load the label names from names.txt
-names = []
 with open(DATASET_PATH / "names.txt", "r") as names_file:
-    names = names_file.read().splitlines()
+    names = [line.strip() for line in names_file.readlines()]
 
 # Initialize the PiCamera
 camera = PiCamera()
@@ -56,7 +55,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             text = f"{name} ({confidence:.2f}%)"
         else:
             text = "Unknown"
+
         cv2.putText(image, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+
+    # Resize the image to fit the LCD screen
+    image = cv2.resize(image, DISPLAY_RESOLUTION)[::-1].swapaxes(0, 1)
 
     # Display the frame
     cv2.imshow("Face Recognition", image)

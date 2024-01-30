@@ -10,7 +10,7 @@ faces = []
 labels = []
 
 with open(DATASET_PATH / "names.txt") as names_file:
-    names = list(names_file.readline())
+    names = [line.strip() for line in names_file.readlines()]
 
 # Loop through each subdirectory in the dataset directory
 for subdir in os.listdir(DATASET_PATH):
@@ -48,6 +48,7 @@ face_recognizer = cv2.face.LBPHFaceRecognizer_create()
 face_recognizer.train(faces, labels)
 
 # Save the trained model
+MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
 face_recognizer.save(MODEL_PATH)
 
 print("Training completed and model saved.")
